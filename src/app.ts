@@ -4,10 +4,20 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import 'dotenv/config';
 import morgan from 'morgan';
+import { Sequelize } from 'sequelize-typescript';
 
 import router from './route';
 
 const app = express();
+
+export const sequelize = new Sequelize({
+  database: 'umbrella',
+  username: 'root',
+  password: '',
+  dialect: 'sqlite',
+  storage: ':memory:',
+  models: [__dirname + '/models'],
+});
 
 app.use(
   session({
