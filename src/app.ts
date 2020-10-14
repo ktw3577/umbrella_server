@@ -4,20 +4,10 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import 'dotenv/config';
 import morgan from 'morgan';
-import { Sequelize } from 'sequelize-typescript';
-
+import { sequelize } from './model';
 import router from './route';
 
 const app = express();
-
-export const sequelize = new Sequelize({
-  database: 'umbrella',
-  username: 'root',
-  password: '',
-  dialect: 'sqlite',
-  storage: ':memory:',
-  models: [__dirname + '/models'],
-});
 
 app.use(
   session({
@@ -53,4 +43,12 @@ app.get('/', (req: express.Request, res: express.Response) => {
 
 app.listen(3000, () => {
   console.log('http://localhost:3000');
+  sequelize.authenticate().then(async () => {
+    console.log('Database connected.');
+    try {
+      await sequelize.sync({ force: true });
+    } catch (error: any) {
+      console.error(error);
+    }
+  });
 });
