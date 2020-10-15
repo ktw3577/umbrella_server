@@ -42,7 +42,10 @@ export default class Schedule extends Model<Schedule> {
   @Column
   creator!: number;
 
-  @BelongsTo(() => User)
+  @BelongsTo(() => User, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
   user: User;
 
   @BelongsToMany(() => User, () => SharedSchedule, 'scheduleId')

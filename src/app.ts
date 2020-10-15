@@ -46,7 +46,7 @@ app.listen(3000, () => {
   sequelize.authenticate().then(async () => {
     console.log('Database connected.');
     try {
-      await sequelize.sync({ force: true });
+      await sequelize.sync({ force: false });
     } catch (error: any) {
       console.error(error);
     }
