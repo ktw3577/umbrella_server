@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { Op } from 'sequelize';
 import Friend from '../model/models/friend';
 import WaitingFriend from '../model/models/waitingFriend';
 import User from '../model/models/user';
@@ -17,7 +16,7 @@ export const signUp = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const body: Body = { ...req.body };
     const { username } = body;
@@ -25,7 +24,7 @@ export const signUp = async (
       username,
     });
     res.status(200).json(newUser);
-  } catch (e: any) {
+  } catch (e) {
     console.error(e);
     res.status(400).send('SignUp is failed.');
     next(e);
@@ -37,7 +36,7 @@ export const searchUser = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const body: Body = { ...req.body };
     const { userId } = body;
@@ -59,7 +58,7 @@ export const addUserId = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const body: Body = { ...req.body };
     const { id, userId } = body;
@@ -86,7 +85,7 @@ export const changeUsername = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const body: Body = { ...req.body };
     const { id, username } = body;
@@ -104,7 +103,7 @@ export const getUserInfo = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const body: Body = { ...req.body };
     const { id } = body;
@@ -122,7 +121,7 @@ export const getFriends = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const { scope } = req.query;
     const { id } = req.params;
@@ -138,7 +137,7 @@ export const requestFriend = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const body: Body = { ...req.body };
     const { id, friendId } = body;
@@ -166,7 +165,7 @@ export const acceptFriend = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const body: Body = { ...req.body };
     const { id, friendId } = body;
@@ -199,7 +198,7 @@ export const rejectFriend = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const body: Body = { ...req.body };
     const { id, friendId } = body;
@@ -222,7 +221,7 @@ export const breakFriend = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const body: Body = { ...req.body };
     const { id, friendId } = body;
@@ -255,7 +254,7 @@ export const breakFriend = async (
       deletedFriendPromise,
       unShareSchedulePromise,
       unSharedSchedulePromise,
-    ]).then(result => {
+    ]).then(() => {
       res.status(200).send('Friend deletion was successful.');
     });
   } catch (e) {
@@ -270,7 +269,7 @@ export const withdrawal = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const body: Body = { ...req.body };
     const { id } = body;

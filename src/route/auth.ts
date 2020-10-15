@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 const router = express.Router();
 
 // 카카오 OAuth & callback

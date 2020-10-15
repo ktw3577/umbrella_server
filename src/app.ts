@@ -47,7 +47,7 @@ app.listen(3000, () => {
     console.log('Database connected.');
     try {
       await sequelize.sync({ force: false });
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
     }
   });
