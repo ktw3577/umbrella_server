@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "server": "nodemon dist/app.js",
-    "build:watch": "tsc --watch"
+    "build:watch": "tsc --watch",
+    "lint": "eslint ./src"
   },
   "repository": {
     "type": "git",
