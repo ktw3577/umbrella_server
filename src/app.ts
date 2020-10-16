@@ -6,6 +6,7 @@ import 'dotenv/config';
 import morgan from 'morgan';
 import { sequelize } from './model';
 import router from './route';
+import passport from 'passport';
 
 const app = express();
 
@@ -31,6 +32,8 @@ app.use(
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan('dev'));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/auth', router.authRouter);
 app.use('/user', router.userRouter);
@@ -40,7 +43,7 @@ app.use('/friend', router.friendRouter);
 app.get('/', (req: express.Request, res: express.Response) => {
   res.send('hello');
 });
-
+//test
 app.listen(3000, () => {
   console.log('http://localhost:3000');
   sequelize.authenticate().then(async () => {

@@ -31,6 +31,10 @@ export default class Todo extends Model implements TodoI {
   @Column
   date!: string;
 
+  @AllowNull(true)
+  @Column
+  note: string;
+
   @ForeignKey(() => Schedule)
   @AllowNull(false)
   @Column
