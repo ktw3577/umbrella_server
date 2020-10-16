@@ -12,6 +12,7 @@ import {
 import Friend from './friend';
 import Schedule from './schedule';
 import SharedSchedule from './sharedSchedule';
+import Todo from './todo';
 import WaitingFriend from './waitingFriend';
 
 @Scopes(() => ({
@@ -33,14 +34,20 @@ import WaitingFriend from './waitingFriend';
       },
     ],
   },
-  friendSchedules: {
-    include: [
-      {
-        model: Schedule,
-        as: 'friendSchedules',
-        through: { attributes: [] },
-      },
-    ],
+  complexFunction(friendId: number) {
+    return {
+      include: [
+        {
+          model: Schedule,
+          as: 'friendSchedules',
+          through: {
+            attributes: [],
+          },
+          where: { creator: friendId },
+          include: [{ model: Todo, as: 'todos' }],
+        },
+      ],
+    };
   },
 }))
 @Table({ tableName: 'users', timestamps: true })
@@ -68,21 +75,24 @@ export default class User extends Model<User> {
   @Column
   snsId: string;
 
-  @BelongsToMany(() => User, () => Friend, 'follower')
+  @BelongsToMany(() => User, () => Friend, 'follower', 'following')
   followers: Array<User & { Friend: Friend }>;
 
-  @BelongsToMany(() => User, () => Friend, 'following')
+  @BelongsToMany(() => User, () => Friend, 'following', 'follower')
   followings: Array<User & { Friend: Friend }>;
 
   @BelongsToMany(() => User, () => WaitingFriend, 'applicant', 'receiver')
-  applicants: Array<User & User>;
+  receivers: Array<User & User>;
 
   @BelongsToMany(() => User, () => WaitingFriend, 'receiver', 'applicant')
-  receivers: Array<User & User>;
+  applicants: Array<User & User>;
 
   @HasMany(() => Schedule)
   mySchedules: Schedule[];
 
-  @BelongsToMany(() => Schedule, () => SharedSchedule, 'userId')
+  @BelongsToMany(() => Schedule, () => SharedSchedule, 'targetUser')
   friendSchedules: Array<Schedule & { SharedSchedule: SharedSchedule }>;
+
+  @HasMany(() => SharedSchedule, 'shareUser')
+  sharingList: SharedSchedule[];
 }

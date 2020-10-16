@@ -13,6 +13,7 @@ export default class Friend extends Model<Friend> {
   @AllowNull(false)
   @Column
   following!: number;
+
   @ForeignKey(() => User)
   @AllowNull(false)
   @Column

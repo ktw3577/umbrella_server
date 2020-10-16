@@ -49,9 +49,8 @@ app.listen(3000, () => {
   sequelize.authenticate().then(async () => {
     console.log('Database connected.');
     try {
-      await sequelize.sync({ force: true });
+      await sequelize.sync({ force: false });
     } catch (error) {
-      // error : any에서 any지움(tsc실행에러발생)
       console.error(error);
     }
   });
