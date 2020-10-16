@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 const router = express.Router();
 
 // 유저의 모든 일정 가져오기

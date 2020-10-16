@@ -62,6 +62,12 @@ export default class User extends Model<User> {
   @Column
   avatarUrl: string;
 
+  @Column
+  provider: string;
+
+  @Column
+  snsId: string;
+
   @BelongsToMany(() => User, () => Friend, 'follower')
   followers: Array<User & { Friend: Friend }>;
 

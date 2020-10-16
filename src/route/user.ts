@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 const router = express.Router();
 
 // 친구 추가 시 유저 검색
