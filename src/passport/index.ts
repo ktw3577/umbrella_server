@@ -8,8 +8,12 @@ import 'dotenv/config';
 const GoogleStrategy = passportGoogle.Strategy;
 const NaverStrategy = passportNaver.Strategy;
 
-passport.serializeUser<any, any>((user, done) => {
-  done(undefined, user.id);
+interface UserI {
+  id: number;
+}
+
+passport.serializeUser<UserI, number>((user, done) => {
+  done(null, user.id);
 });
 
 passport.deserializeUser((id, done) => {
@@ -38,7 +42,7 @@ passport.use(
             username: displayName,
             snsId: `${id}`,
             provider: 'google',
-            avartar_url: _json && _json.picture,
+            avatarUrl: _json && _json.picture,
           });
           done(null, newUser);
         }
@@ -59,7 +63,6 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        console.log('test');
         const existedUser = await User.findOne({
           where: { snsId: profile.id, provider: 'kakao' },
         });
@@ -71,8 +74,7 @@ passport.use(
             username: profile.displayName,
             snsId: `${profile.id}`,
             provider: 'kakao',
-            avartar_url:
-              profile._json && profile._json.properties.profile_image,
+            avatarUrl: profile._json && profile._json.properties.profile_image,
           });
           done(null, newUser);
         }
@@ -107,9 +109,8 @@ passport.use(
             username: displayName,
             snsId: `${id}`,
             provider: 'naver',
-            avartar_url: _json && _json.profile_image,
+            avatarUrl: _json && _json.profile_image,
           });
-          console.log(profile);
           done(null, newUser);
         }
       } catch (err) {

@@ -5,7 +5,6 @@ import Todo from '../model/models/todo';
 import SharedSchedule from '../model/models/sharedSchedule';
 
 interface Body {
-  id: number;
   scheduleId: number;
   todos: [];
   title: string;
@@ -18,8 +17,7 @@ export const getUserSchedule = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const body: Body = { ...req.body };
-    const { id } = body;
+    const id: number = req.session.passport.user;
     const schedules = await Schedule.findAll({
       where: { creator: id },
       include: [Todo],
@@ -39,7 +37,8 @@ export const createSchedule = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const { id, todos, title } = body;
+    const { todos, title } = body;
+    const id: number = req.session.passport.user;
     const schedule = await Schedule.create({
       creator: id,
       title,
@@ -115,7 +114,8 @@ export const shareSchedule = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const { scheduleId, friendId, id } = body;
+    const { scheduleId, friendId } = body;
+    const id: number = req.session.passport.user;
     const sharedSchedule = await SharedSchedule.create({
       targetUser: friendId,
       scheduleId,
@@ -136,7 +136,8 @@ export const friendSchedule = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const { id, friendId } = body;
+    const { friendId } = body;
+    const id: number = req.session.passport.user;
     const sharedSchedules = await User.scope({
       method: ['complexFunction', friendId],
     }).findByPk(id);
@@ -155,7 +156,8 @@ export const RemoveSchedule = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const { id, scheduleId } = body;
+    const { scheduleId } = body;
+    const id: number = req.session.passport.user;
     const deletedSchedule = await Schedule.destroy({
       where: { id: scheduleId, creator: id },
     });
