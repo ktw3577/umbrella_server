@@ -4,7 +4,6 @@ import AWS = require('aws-sdk');
 import path = require('path');
 import multer = require('multer');
 import multerS3 = require('multer-s3');
-import User from '../model/models/user';
 const router = express.Router();
 
 const s3 = new AWS.S3();
@@ -33,27 +32,7 @@ router.patch('/userId', userController.addUserId);
 router.delete('/withdraw', userController.withdrawal);
 // 로컬 테스트 용 유저 추가
 router.post('/testUser', userController.signUp);
-
 //user 프로필 이미지 수정
-router.post('/avatar', upload.single('avatar'), (req, res) => {
-  try {
-    const payLoad = req.file.location;
-    User.update(
-      {
-        avartar_url: payLoad,
-      },
-      {
-        where: {
-          id: req.session.passport.user, //수정되야함
-        },
-      }
-    ).then(() => {
-      res.status(200).send(payLoad);
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('서버 에러');
-  }
-});
+router.post('/avatar', upload.single('avatar'), userController.changeAvatar);
 
 export default router;
