@@ -2,15 +2,15 @@ import { Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
 
-interface UserI<T> {
-  snsId: T;
-}
+// interface UserI<T> {
+//   snsId: T;
+// }
 
 const socialLoginResponse = (
   req: Request,
   res: Response,
   err: Error,
-  user: UserI<string>
+  user: UserNS.User
 ) => {
   if (err) {
     return res.status(400);

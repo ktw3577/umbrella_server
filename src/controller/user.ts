@@ -61,7 +61,8 @@ export const addUserId = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const { userId, id } = body;
+    const { userId } = body;
+    const { id } = req.user;
     const isExisted = await User.findOne({
       where: {
         userId,
@@ -88,7 +89,8 @@ export const changeUsername = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const { username, id } = body;
+    const { username } = body;
+    const { id } = req.user;
     await User.update({ username }, { where: { id } });
     res.status(200).json({ id, username });
   } catch (e) {
@@ -105,7 +107,7 @@ export const getUserInfo = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { id } = req.params;
+    const { id } = req.user;
     const user = await User.findOne({ where: { id } });
     res.status(200).json(user);
   } catch (e) {
@@ -123,7 +125,7 @@ export const getFriends = async (
 ): Promise<void> => {
   try {
     const { scope } = req.query;
-    const { id } = req.params;
+    const { id } = req.user;
     const friends = await User.scope(`${scope}`).findByPk(id);
     res.json(friends);
   } catch (e) {
@@ -139,7 +141,8 @@ export const requestFriend = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const { friendId, id } = body;
+    const { friendId } = body;
+    const { id } = req.user;
     const isExisted = await WaitingFriend.findOne({
       where: { applicant: friendId, receiver: id },
     });
@@ -167,7 +170,8 @@ export const acceptFriend = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const { friendId, id } = body;
+    const { friendId } = body;
+    const { id } = req.user;
     const destroyWaiting = WaitingFriend.destroy({
       where: {
         applicant: friendId,
@@ -200,7 +204,8 @@ export const rejectFriend = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const { friendId, id } = body;
+    const { friendId } = body;
+    const { id } = req.user;
     await WaitingFriend.destroy({
       where: {
         applicant: friendId,
@@ -223,7 +228,8 @@ export const breakFriend = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const { friendId, id } = body;
+    const { friendId } = body;
+    const { id } = req.user;
     const deleteFriendPromise = Friend.destroy({
       where: {
         follower: friendId,
@@ -270,7 +276,7 @@ export const withdrawal = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const id: number = req.body.id;
+    const { id } = req.user;
     await User.destroy({
       where: {
         id,
@@ -292,7 +298,7 @@ export const changeAvatar = async (
 ): Promise<void> => {
   try {
     const payLoad = req.file.location;
-    const id: number = req.body.id;
+    const { id } = req.user;
     User.update(
       {
         avartar_url: payLoad,

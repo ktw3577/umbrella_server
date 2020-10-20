@@ -113,7 +113,7 @@ passport.use(
   new JWTStrategy(jwtOpts, async (jwtPayload, done) => {
     try {
       const user = await User.findOne({
-        where: { snsId: jwtPayload.snsId },
+        where: { snsId: jwtPayload.id },
       });
 
       if (user) {
