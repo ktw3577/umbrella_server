@@ -54,7 +54,6 @@ passport.use(
       callbackURL: '/auth/google/callback',
     },
     (accessToken, refreshToken, profile, done) => {
-      console.log(profile);
       const loginData = {
         username: profile.displayName,
         snsId: profile.id,

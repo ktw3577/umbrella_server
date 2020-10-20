@@ -9,7 +9,14 @@ import passport from 'passport';
 require('./passport');
 import isLoggedIn from './passport/middleware';
 
+import AWS from 'aws-sdk';
 const app = express();
+
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: 'ap-northeast-2',
+});
 
 app.use(
   cors({
