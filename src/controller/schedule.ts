@@ -9,6 +9,7 @@ interface Body {
   todos: [];
   title: string;
   friendId: number;
+  id: number;
 }
 
 export const getUserSchedule = async (
@@ -17,7 +18,7 @@ export const getUserSchedule = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const id: number = req.session.passport.user;
+    const { id } = req.params;
     const schedules = await Schedule.findAll({
       where: { creator: id },
       include: [Todo],
@@ -37,8 +38,7 @@ export const createSchedule = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const { todos, title } = body;
-    const id: number = req.session.passport.user;
+    const { todos, title, id } = body;
     const schedule = await Schedule.create({
       creator: id,
       title,
@@ -72,13 +72,13 @@ export const changeSchedule = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const { scheduleId, todos, title } = body;
+    const { scheduleId, todos, title, id } = body;
     const schedule = await Schedule.update(
       {
         title,
       },
       {
-        where: { id: scheduleId },
+        where: { id: scheduleId, creator: id },
       }
     );
     await Todo.destroy({
@@ -114,8 +114,7 @@ export const shareSchedule = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const { scheduleId, friendId } = body;
-    const id: number = req.session.passport.user;
+    const { scheduleId, friendId, id } = body;
     const sharedSchedule = await SharedSchedule.create({
       targetUser: friendId,
       scheduleId,
@@ -135,9 +134,7 @@ export const friendSchedule = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const body: Body = { ...req.body };
-    const { friendId } = body;
-    const id: number = req.session.passport.user;
+    const { friendId, id } = req.params;
     const sharedSchedules = await User.scope({
       method: ['complexFunction', friendId],
     }).findByPk(id);
@@ -156,8 +153,7 @@ export const RemoveSchedule = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const { scheduleId } = body;
-    const id: number = req.session.passport.user;
+    const { scheduleId, id } = body;
     const deletedSchedule = await Schedule.destroy({
       where: { id: scheduleId, creator: id },
     });

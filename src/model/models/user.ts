@@ -69,11 +69,21 @@ export default class User extends Model<User> {
   @Column
   avatarUrl: string;
 
+  @AllowNull(false)
   @Column
   provider: string;
 
+  @AllowNull(false)
   @Column
   snsId: string;
+
+  @AllowNull(true)
+  @Column
+  refreshToken: string;
+
+  @AllowNull(false)
+  @Column
+  accessToken: string;
 
   @BelongsToMany(() => User, () => Friend, 'follower', 'following')
   followers: Array<User & { Friend: Friend }>;
