@@ -8,6 +8,7 @@ interface Body {
   username: string;
   userId: string;
   friendId: number;
+  id: number;
 }
 
 // 테스트 유저 추가
@@ -60,8 +61,7 @@ export const addUserId = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const id: number = req.session.passport.user;
-    const { userId } = body;
+    const { userId, id } = body;
     const isExisted = await User.findOne({
       where: {
         userId,
@@ -88,8 +88,7 @@ export const changeUsername = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const id: number = req.session.passport.user;
-    const { username } = body;
+    const { username, id } = body;
     await User.update({ username }, { where: { id } });
     res.status(200).json({ id, username });
   } catch (e) {
@@ -106,7 +105,7 @@ export const getUserInfo = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const id: number = req.session.passport.user;
+    const { id } = req.params;
     const user = await User.findOne({ where: { id } });
     res.status(200).json(user);
   } catch (e) {
@@ -140,8 +139,7 @@ export const requestFriend = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const { friendId } = body;
-    const id: number = req.session.passport.user;
+    const { friendId, id } = body;
     const isExisted = await WaitingFriend.findOne({
       where: { applicant: friendId, receiver: id },
     });
@@ -169,8 +167,7 @@ export const acceptFriend = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const { friendId } = body;
-    const id: number = req.session.passport.user;
+    const { friendId, id } = body;
     const destroyWaiting = WaitingFriend.destroy({
       where: {
         applicant: friendId,
@@ -203,8 +200,7 @@ export const rejectFriend = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const { friendId } = body;
-    const id: number = req.session.passport.user;
+    const { friendId, id } = body;
     await WaitingFriend.destroy({
       where: {
         applicant: friendId,
@@ -227,8 +223,7 @@ export const breakFriend = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const { friendId } = body;
-    const id: number = req.session.passport.user;
+    const { friendId, id } = body;
     const deleteFriendPromise = Friend.destroy({
       where: {
         follower: friendId,
@@ -275,7 +270,7 @@ export const withdrawal = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const id: number = req.session.passport.user;
+    const id: number = req.body.id;
     await User.destroy({
       where: {
         id,

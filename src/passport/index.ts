@@ -3,24 +3,48 @@ import User from '../model/models/user';
 import passportGoogle from 'passport-google-oauth20';
 import { Strategy as KakaoStrategy } from 'passport-kakao';
 import passportNaver from 'passport-naver';
+import {
+  Strategy as JWTStrategy,
+  ExtractJwt as ExtractJWT,
+} from 'passport-jwt';
 import 'dotenv/config';
 
 const GoogleStrategy = passportGoogle.Strategy;
 const NaverStrategy = passportNaver.Strategy;
 
-interface UserI {
-  id: number;
+interface LoginDataI {
+  username: string;
+  snsId: string;
+  provider: string;
+  avatarUrl: string;
 }
 
-passport.serializeUser<UserI, number>((user, done) => {
-  done(null, user.id);
-});
-
-passport.deserializeUser((id, done) => {
-  User.findOne({ where: { id } })
-    .then(user => done(null, user))
-    .catch(err => done(err));
-});
+const socialLogin = async (
+  loginData: LoginDataI,
+  accessToken: string,
+  refreshToken: string,
+  done: passportGoogle.VerifyCallback
+) => {
+  const { username, snsId, provider, avatarUrl } = loginData;
+  try {
+    User.findOrCreate({
+      where: {
+        snsId,
+      },
+      defaults: {
+        username,
+        accessToken,
+        refreshToken,
+        provider,
+        avatarUrl,
+      },
+    }).then(([user]) => {
+      return done(null, user);
+    });
+  } catch (err) {
+    return done(err, false);
+  }
+};
 
 passport.use(
   new GoogleStrategy(
@@ -29,27 +53,15 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: '/auth/google/callback',
     },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        const existedUser = await User.findOne({
-          where: { snsId: profile.id, provider: 'google' },
-        });
-        if (existedUser) {
-          done(null, existedUser);
-        } else {
-          const { _json, displayName, id } = profile;
-          const newUser = await User.create({
-            username: displayName,
-            snsId: `${id}`,
-            provider: 'google',
-            avatarUrl: _json && _json.picture,
-          });
-          done(null, newUser);
-        }
-      } catch (err) {
-        console.error(err);
-        done(err);
-      }
+    (accessToken, refreshToken, profile, done) => {
+      console.log(profile);
+      const loginData = {
+        username: profile.displayName,
+        snsId: profile.id,
+        provider: 'google',
+        avatarUrl: profile._json && profile._json.picture,
+      };
+      return socialLogin(loginData, accessToken, refreshToken, done);
     }
   )
 );
@@ -61,27 +73,14 @@ passport.use(
       clientSecret: process.env.KAKAO_CLIENT_SECRET,
       callbackURL: '/auth/kakao/callback',
     },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        const existedUser = await User.findOne({
-          where: { snsId: profile.id, provider: 'kakao' },
-        });
-        if (existedUser) {
-          done(null, existedUser);
-        } else {
-          const newUser = await User.create({
-            email: profile._json && profile._json.kakao_account.email,
-            username: profile.displayName,
-            snsId: `${profile.id}`,
-            provider: 'kakao',
-            avatarUrl: profile._json && profile._json.properties.profile_image,
-          });
-          done(null, newUser);
-        }
-      } catch (error) {
-        console.error(error);
-        done(error);
-      }
+    (accessToken, refreshToken, profile, done) => {
+      const loginData = {
+        username: profile.displayName,
+        snsId: profile.id,
+        provider: 'kakao',
+        avatarUrl: profile._json && profile._json.properties.profile_image,
+      };
+      return socialLogin(loginData, accessToken, refreshToken, done);
     }
   )
 );
@@ -93,32 +92,40 @@ passport.use(
       clientSecret: process.env.NAVER_CLIENT_SECRET,
       callbackURL: '/auth/naver/callback',
     },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        const existedUser = await User.findOne({
-          where: { snsId: profile.id, provider: 'naver' },
-        });
-        if (existedUser) {
-          done(null, existedUser);
-        } else {
-          const { _json, displayName, id } = profile;
-          if (profile.displayName.indexOf('*') === -1) {
-          }
-          const newUser = await User.create({
-            email: _json && _json.email,
-            username: displayName,
-            snsId: `${id}`,
-            provider: 'naver',
-            avatarUrl: _json && _json.profile_image,
-          });
-          done(null, newUser);
-        }
-      } catch (err) {
-        console.error(err);
-        done(err);
-      }
+    (accessToken, refreshToken, profile, done) => {
+      const loginData = {
+        username: profile.displayName,
+        snsId: profile.id,
+        provider: 'naver',
+        avatarUrl: profile._json && profile._json.profile_image,
+      };
+      return socialLogin(loginData, accessToken, refreshToken, done);
     }
   )
+);
+
+const jwtOpts = {
+  jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.JWT_SECRET,
+};
+
+passport.use(
+  'jwt',
+  new JWTStrategy(jwtOpts, async (jwtPayload, done) => {
+    try {
+      const user = await User.findOne({
+        where: { snsId: jwtPayload.snsId },
+      });
+
+      if (user) {
+        done(null, user);
+      } else {
+        done('User does not exist.', false);
+      }
+    } catch (err) {
+      done(err, false);
+    }
+  })
 );
 
 export default passport;
