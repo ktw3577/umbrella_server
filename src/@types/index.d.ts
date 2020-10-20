@@ -247,7 +247,7 @@ declare namespace multer {
     _handleFile(
       req: Request,
       file: Express.Multer.File,
-      callback: (error?: any, info?: Partial<Express.Multer.File>) => void
+      callback: (error: Error, info?: Partial<Express.Multer.File>) => void
     ): void;
     /**
      * Remove the file described by `file`, then invoke the callback with.

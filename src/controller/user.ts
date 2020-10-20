@@ -283,3 +283,31 @@ export const withdrawal = async (
     next(e);
   }
 };
+
+// 아바타 수정
+export const changeAvatar = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const payLoad = req.file.location;
+    const id: number = req.body.id;
+    User.update(
+      {
+        avartar_url: payLoad,
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    ).then(() => {
+      res.status(200).send(payLoad);
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('서버 에러');
+    next(err);
+  }
+};
