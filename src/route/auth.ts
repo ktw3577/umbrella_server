@@ -42,4 +42,22 @@ router.get(
     res.redirect(301, process.env.CLIENT_URL);
   }
 );
+
+router.get('/signOut', (req: Request, res: Response) => {
+  try {
+    console.log(req.session.passport.user);
+    req.logout();
+    req.session.destroy(function (err) {
+      if (err) {
+        console.error(err);
+      }
+    });
+    console.log(req.session);
+    res.status(302).send('successfully logged out');
+  } catch (err) {
+    console.error(err);
+    res.status(400).send("You're not logged in.");
+  }
+});
+
 export default router;
