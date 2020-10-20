@@ -6,6 +6,7 @@
   "scripts": {
     "server": "nodemon dist/app.js",
     "build:watch": "tsc --watch",
+    "build": "tsc",
     "lint": "eslint ./src"
   },
   "repository": {
