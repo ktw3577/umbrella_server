@@ -37,12 +37,12 @@ export const searchUser = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const body: Body = { ...req.body };
-    const { userId } = body;
+    const { userId } = req.params;
     const user = await User.findOne({
       where: {
         userId,
       },
+      attributes: ['id', 'username', 'avatarUrl'],
     });
     user ? res.status(200).json(user) : res.status(400).send('No result.');
   } catch (e) {
@@ -60,8 +60,8 @@ export const addUserId = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const id: number = req.session.passport.user;
     const { userId } = body;
+    const { id } = req.user;
     const isExisted = await User.findOne({
       where: {
         userId,
@@ -88,8 +88,8 @@ export const changeUsername = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const id: number = req.session.passport.user;
     const { username } = body;
+    const { id } = req.user;
     await User.update({ username }, { where: { id } });
     res.status(200).json({ id, username });
   } catch (e) {
@@ -106,8 +106,11 @@ export const getUserInfo = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const id: number = req.session.passport.user;
-    const user = await User.findOne({ where: { id } });
+    const { id } = req.user;
+    const user = await User.findOne({
+      where: { id },
+      attributes: ['id', 'username', 'userId', 'avatarUrl'],
+    });
     res.status(200).json(user);
   } catch (e) {
     console.error(e);
@@ -124,7 +127,7 @@ export const getFriends = async (
 ): Promise<void> => {
   try {
     const { scope } = req.query;
-    const { id } = req.params;
+    const { id } = req.user;
     const friends = await User.scope(`${scope}`).findByPk(id);
     res.json(friends);
   } catch (e) {
@@ -141,7 +144,7 @@ export const requestFriend = async (
   try {
     const body: Body = { ...req.body };
     const { friendId } = body;
-    const id: number = req.session.passport.user;
+    const { id } = req.user;
     const isExisted = await WaitingFriend.findOne({
       where: { applicant: friendId, receiver: id },
     });
@@ -170,7 +173,7 @@ export const acceptFriend = async (
   try {
     const body: Body = { ...req.body };
     const { friendId } = body;
-    const id: number = req.session.passport.user;
+    const { id } = req.user;
     const destroyWaiting = WaitingFriend.destroy({
       where: {
         applicant: friendId,
@@ -204,7 +207,7 @@ export const rejectFriend = async (
   try {
     const body: Body = { ...req.body };
     const { friendId } = body;
-    const id: number = req.session.passport.user;
+    const { id } = req.user;
     await WaitingFriend.destroy({
       where: {
         applicant: friendId,
@@ -228,7 +231,7 @@ export const breakFriend = async (
   try {
     const body: Body = { ...req.body };
     const { friendId } = body;
-    const id: number = req.session.passport.user;
+    const { id } = req.user;
     const deleteFriendPromise = Friend.destroy({
       where: {
         follower: friendId,
@@ -275,7 +278,7 @@ export const withdrawal = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const id: number = req.session.passport.user;
+    const { id } = req.user;
     await User.destroy({
       where: {
         id,
@@ -286,5 +289,33 @@ export const withdrawal = async (
     console.error(e);
     res.status(500).send('Internal server error');
     next(e);
+  }
+};
+
+// 아바타 수정
+export const changeAvatar = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const payLoad = req.file.location;
+    const { id } = req.user;
+    User.update(
+      {
+        avartar_url: payLoad,
+      },
+      {
+        where: {
+          id,
+        },
+      }
+    ).then(() => {
+      res.status(200).send(payLoad);
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Internal server error');
+    next(err);
   }
 };

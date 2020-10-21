@@ -10,14 +10,14 @@ interface Body {
   title: string;
   friendId: number;
 }
-
+// 유저 일정 가져오기
 export const getUserSchedule = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const id: number = req.session.passport.user;
+    const { id } = req.user;
     const schedules = await Schedule.findAll({
       where: { creator: id },
       include: [Todo],
@@ -29,7 +29,7 @@ export const getUserSchedule = async (
     next(e);
   }
 };
-
+// 일정 생성
 export const createSchedule = async (
   req: Request,
   res: Response,
@@ -38,7 +38,7 @@ export const createSchedule = async (
   try {
     const body: Body = { ...req.body };
     const { todos, title } = body;
-    const id: number = req.session.passport.user;
+    const { id } = req.user;
     const schedule = await Schedule.create({
       creator: id,
       title,
@@ -64,7 +64,7 @@ export const createSchedule = async (
     next(e);
   }
 };
-
+// 일정 변경
 export const changeSchedule = async (
   req: Request,
   res: Response,
@@ -73,12 +73,13 @@ export const changeSchedule = async (
   try {
     const body: Body = { ...req.body };
     const { scheduleId, todos, title } = body;
+    const { id } = req.user;
     const schedule = await Schedule.update(
       {
         title,
       },
       {
-        where: { id: scheduleId },
+        where: { id: scheduleId, creator: id },
       }
     );
     await Todo.destroy({
@@ -106,7 +107,7 @@ export const changeSchedule = async (
     next(e);
   }
 };
-
+// 일정 공유하기
 export const shareSchedule = async (
   req: Request,
   res: Response,
@@ -115,7 +116,7 @@ export const shareSchedule = async (
   try {
     const body: Body = { ...req.body };
     const { scheduleId, friendId } = body;
-    const id: number = req.session.passport.user;
+    const { id } = req.user;
     const sharedSchedule = await SharedSchedule.create({
       targetUser: friendId,
       scheduleId,
@@ -128,16 +129,15 @@ export const shareSchedule = async (
     next(e);
   }
 };
-
+// 친구가 공유한 일정 가져오기
 export const friendSchedule = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const body: Body = { ...req.body };
-    const { friendId } = body;
-    const id: number = req.session.passport.user;
+    const { friendId } = req.params;
+    const { id } = req.user;
     const sharedSchedules = await User.scope({
       method: ['complexFunction', friendId],
     }).findByPk(id);
@@ -148,7 +148,7 @@ export const friendSchedule = async (
     next(e);
   }
 };
-
+// 일정 삭제
 export const RemoveSchedule = async (
   req: Request,
   res: Response,
@@ -157,7 +157,7 @@ export const RemoveSchedule = async (
   try {
     const body: Body = { ...req.body };
     const { scheduleId } = body;
-    const id: number = req.session.passport.user;
+    const { id } = req.user;
     const deletedSchedule = await Schedule.destroy({
       where: { id: scheduleId, creator: id },
     });

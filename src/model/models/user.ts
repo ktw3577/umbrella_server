@@ -17,25 +17,30 @@ import WaitingFriend from './waitingFriend';
 
 @Scopes(() => ({
   followers: {
+    attributes: ['id', 'username', 'avatarUrl'],
     include: [
       {
         model: User,
         as: 'followers',
+        attributes: ['id', 'username', 'avatarUrl'],
         through: { attributes: [] },
       },
     ],
   },
   applicants: {
+    attributes: ['id', 'username', 'avatarUrl'],
     include: [
       {
         model: User,
         as: 'applicants',
+        attributes: ['id', 'username', 'avatarUrl'],
         through: { attributes: [] },
       },
     ],
   },
   complexFunction(friendId: number) {
     return {
+      attributes: ['id', 'avatarUrl', 'username'],
       include: [
         {
           model: Schedule,
@@ -69,11 +74,21 @@ export default class User extends Model<User> {
   @Column
   avatarUrl: string;
 
+  @AllowNull(false)
   @Column
   provider: string;
 
+  @AllowNull(false)
   @Column
   snsId: string;
+
+  @AllowNull(true)
+  @Column
+  refreshToken: string;
+
+  @AllowNull(false)
+  @Column
+  accessToken: string;
 
   @BelongsToMany(() => User, () => Friend, 'follower', 'following')
   followers: Array<User & { Friend: Friend }>;
