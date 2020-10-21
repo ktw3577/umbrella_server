@@ -8,7 +8,6 @@ interface Body {
   username: string;
   userId: string;
   friendId: number;
-  id: number;
 }
 
 // 테스트 유저 추가
@@ -38,12 +37,12 @@ export const searchUser = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const body: Body = { ...req.body };
-    const { userId } = body;
+    const { userId } = req.params;
     const user = await User.findOne({
       where: {
         userId,
       },
+      attributes: ['id', 'username', 'avatarUrl'],
     });
     user ? res.status(200).json(user) : res.status(400).send('No result.');
   } catch (e) {
@@ -108,7 +107,10 @@ export const getUserInfo = async (
 ): Promise<void> => {
   try {
     const { id } = req.user;
-    const user = await User.findOne({ where: { id } });
+    const user = await User.findOne({
+      where: { id },
+      attributes: ['id', 'username', 'userId', 'avatarUrl'],
+    });
     res.status(200).json(user);
   } catch (e) {
     console.error(e);
@@ -313,7 +315,7 @@ export const changeAvatar = async (
     });
   } catch (err) {
     console.error(err);
-    res.status(500).send('서버 에러');
+    res.status(500).send('Internal server error');
     next(err);
   }
 };

@@ -13,5 +13,5 @@ router.delete('/', scheduleController.RemoveSchedule);
 // 일정 공유
 router.post('/share', scheduleController.shareSchedule);
 // 공유 받은 일정
-router.get('/friendSchedules', scheduleController.friendSchedule);
+router.get('/friendSchedules/:friendId', scheduleController.friendSchedule);
 export default router;

@@ -17,25 +17,30 @@ import WaitingFriend from './waitingFriend';
 
 @Scopes(() => ({
   followers: {
+    attributes: ['id', 'username', 'avatarUrl'],
     include: [
       {
         model: User,
         as: 'followers',
+        attributes: ['id', 'username', 'avatarUrl'],
         through: { attributes: [] },
       },
     ],
   },
   applicants: {
+    attributes: ['id', 'username', 'avatarUrl'],
     include: [
       {
         model: User,
         as: 'applicants',
+        attributes: ['id', 'username', 'avatarUrl'],
         through: { attributes: [] },
       },
     ],
   },
   complexFunction(friendId: number) {
     return {
+      attributes: ['id', 'avatarUrl', 'username'],
       include: [
         {
           model: Schedule,

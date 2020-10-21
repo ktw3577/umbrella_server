@@ -3,7 +3,7 @@ import * as userController from '../controller/user';
 const router = express.Router();
 
 // 친구 목록 & 요청 대기 중인 목록
-router.get('/:id', userController.getFriends);
+router.get('/', userController.getFriends);
 // 친구 요청 보내기
 router.post('/waiting', userController.requestFriend);
 // 친구 요청 수락
