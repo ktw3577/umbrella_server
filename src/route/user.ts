@@ -21,7 +21,7 @@ const upload = multer({
 });
 
 // 친구 추가 시 유저 검색
-router.get('/search', userController.searchUser);
+router.get('/search/:userId', userController.searchUser);
 // 로그인 유저 정보
 router.get('/detail', userController.getUserInfo);
 // username 변경
@@ -33,6 +33,6 @@ router.delete('/withdraw', userController.withdrawal);
 // 로컬 테스트 용 유저 추가
 router.post('/testUser', userController.signUp);
 //user 프로필 이미지 수정
-router.post('/avatar', upload.single('avatar'), userController.changeAvatar);
+router.patch('/avatar', upload.single('avatar'), userController.changeAvatar);
 
 export default router;
