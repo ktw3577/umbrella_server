@@ -9,6 +9,7 @@ interface Body {
   todos: [];
   title: string;
   friendId: number;
+  date: string;
 }
 // 유저 일정 가져오기
 export const getUserSchedule = async (
@@ -37,11 +38,12 @@ export const createSchedule = async (
 ): Promise<void> => {
   try {
     const body: Body = { ...req.body };
-    const { todos, title } = body;
+    const { todos, title, date } = body;
     const { id } = req.user;
     const schedule = await Schedule.create({
       creator: id,
       title,
+      date,
     });
     if (todos.length > 0) {
       const todosPromise = [];

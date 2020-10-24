@@ -37,6 +37,10 @@ export default class Schedule extends Model<Schedule> {
   @Column
   title!: string;
 
+  @AllowNull(false)
+  @Column
+  date!: string;
+
   @ForeignKey(() => User)
   @AllowNull(false)
   @Column
