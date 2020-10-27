@@ -21,7 +21,15 @@ export const getUserSchedule = async (
     const { id } = req.user;
     const schedules = await Schedule.findAll({
       where: { creator: id },
-      include: [Todo],
+      order: [
+        ['date', 'ASC'],
+        [{ model: Todo, as: 'todos' }, 'date', 'ASC'],
+      ],
+      include: [
+        {
+          model: Todo,
+        },
+      ],
     });
     res.status(200).json(schedules);
   } catch (e) {
@@ -52,10 +60,15 @@ export const createSchedule = async (
           location: todos[i]['location'],
           date: todos[i]['date'],
           scheduleId: schedule.id,
+          note: todos[i]['note'],
         });
       }
-      Promise.all(todosPromise).then(() => {
-        res.status(200).json(schedule);
+      Promise.all(todosPromise).then(async () => {
+        const newSchedule = await Schedule.findOne({
+          where: { id: schedule.id },
+          include: [Todo],
+        });
+        res.status(200).json(newSchedule);
       });
     } else {
       res.status(400).send('Todos is empty.');
