@@ -9,7 +9,7 @@ router.post('/', scheduleController.createSchedule);
 // 일정 수정
 router.patch('/', scheduleController.changeSchedule);
 // 일정 삭제
-router.delete('/', scheduleController.RemoveSchedule);
+router.delete('/:scheduleId', scheduleController.RemoveSchedule);
 // 일정 공유
 router.post('/share', scheduleController.shareSchedule);
 // 공유 받은 일정

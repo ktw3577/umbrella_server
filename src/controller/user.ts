@@ -205,8 +205,7 @@ export const rejectFriend = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const body: Body = { ...req.body };
-    const { friendId } = body;
+    const { friendId } = req.params;
     const { id } = req.user;
     await WaitingFriend.destroy({
       where: {
@@ -229,8 +228,7 @@ export const breakFriend = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const body: Body = { ...req.body };
-    const { friendId } = body;
+    const { friendId } = req.params;
     const { id } = req.user;
     const deleteFriendPromise = Friend.destroy({
       where: {

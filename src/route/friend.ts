@@ -9,7 +9,7 @@ router.post('/waiting', userController.requestFriend);
 // 친구 요청 수락
 router.post('/accept', userController.acceptFriend);
 // 친구 요청 거절
-router.delete('/reject', userController.rejectFriend);
+router.delete('/reject/:friendId', userController.rejectFriend);
 // 친구 삭제
-router.delete('/', userController.breakFriend);
+router.delete('/:friendId', userController.breakFriend);
 export default router;
