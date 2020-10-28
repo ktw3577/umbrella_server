@@ -177,11 +177,11 @@ export const RemoveSchedule = async (
       where: { id: scheduleId, creator: id },
     });
     deletedSchedule
-      ? res.status(200).send('The schedule has been deleted successfully.')
-      : res.status(401).send('This is an unauthorized request.');
+      ? res.status(200).send({ success: true, status: 200 })
+      : res.status(401).json({ success: false, status: 401 });
   } catch (e) {
     console.error(e);
-    res.status(500).send('Internal server error');
+    res.status(500).send({ success: false, status: 500 });
     next(e);
   }
 };
