@@ -170,8 +170,7 @@ export const RemoveSchedule = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const body: Body = { ...req.body };
-    const { scheduleId } = body;
+    const { scheduleId } = req.params;
     const { id } = req.user;
     const deletedSchedule = await Schedule.destroy({
       where: { id: scheduleId, creator: id },
