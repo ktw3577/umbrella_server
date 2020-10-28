@@ -209,7 +209,7 @@ export const rejectFriend = async (
     const { id } = req.user;
     await WaitingFriend.destroy({
       where: {
-        applicant: friendId,
+        applicant: Number(friendId),
         receiver: id,
       },
     });
@@ -232,7 +232,7 @@ export const breakFriend = async (
     const { id } = req.user;
     const deleteFriendPromise = Friend.destroy({
       where: {
-        follower: friendId,
+        follower: Number(friendId),
         following: id,
       },
     });

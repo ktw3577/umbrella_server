@@ -173,7 +173,7 @@ export const RemoveSchedule = async (
     const { scheduleId } = req.params;
     const { id } = req.user;
     const deletedSchedule = await Schedule.destroy({
-      where: { id: scheduleId, creator: id },
+      where: { id: Number(scheduleId), creator: id },
     });
     deletedSchedule
       ? res.status(200).send({ success: true, status: 200 })
