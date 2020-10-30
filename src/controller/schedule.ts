@@ -23,7 +23,7 @@ export const getUserSchedule = async (
       where: { creator: id },
       order: [
         ['date', 'ASC'],
-        [{ model: Todo, as: 'todos' }, 'date', 'ASC'],
+        [{ model: Todo, as: 'todos' }, 'hour', 'ASC'],
       ],
       include: [
         {
@@ -58,7 +58,8 @@ export const createSchedule = async (
       for (let i = 0; i < todos.length; i++) {
         todosPromise[i] = Todo.create({
           location: todos[i]['location'],
-          date: todos[i]['date'],
+          hour: todos[i]['hour'],
+          minutes: todos[i]['minutes'],
           scheduleId: schedule.id,
           note: todos[i]['note'],
         });
@@ -106,7 +107,8 @@ export const changeSchedule = async (
       for (let i = 0; i < todos.length; i++) {
         todosPromise[i] = Todo.create({
           location: todos[i]['location'],
-          date: todos[i]['date'],
+          hour: todos[i]['hour'],
+          minutes: todos[i]['minutes'],
           scheduleId,
         });
       }
