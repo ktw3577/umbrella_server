@@ -299,18 +299,17 @@ export const changeAvatar = async (
   try {
     const payLoad = req.file.location;
     const { id } = req.user;
-    User.update(
+    await User.update(
       {
-        avartarUrl: payLoad,
+        avatarUrl: payLoad,
       },
       {
         where: {
           id,
         },
       }
-    ).then(() => {
-      res.status(200).send(payLoad);
-    });
+    );
+    res.status(200).send(payLoad);
   } catch (err) {
     console.error(err);
     res.status(500).send('Internal server error');

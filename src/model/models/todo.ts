@@ -12,8 +12,12 @@ import Schedule from './schedule';
 
 export interface TodoI {
   id: number;
-  location: string;
-  date: string;
+  minutes: number;
+  hour: number;
+  note: string;
+  placeName: string;
+  latitude: string;
+  longitude: string;
 }
 
 @Table({ tableName: 'todos', timestamps: true })
@@ -25,11 +29,23 @@ export default class Todo extends Model implements TodoI {
 
   @AllowNull(false)
   @Column
-  location!: string;
+  placeName!: string;
 
   @AllowNull(false)
   @Column
-  date!: string;
+  latitude!: string;
+
+  @AllowNull(false)
+  @Column
+  longitude!: string;
+
+  @AllowNull(false)
+  @Column
+  hour!: number;
+
+  @AllowNull(false)
+  @Column
+  minutes!: number;
 
   @AllowNull(true)
   @Column
