@@ -301,7 +301,7 @@ export const changeAvatar = async (
     const { id } = req.user;
     User.update(
       {
-        avartar_url: payLoad,
+        avartarUrl: payLoad,
       },
       {
         where: {
