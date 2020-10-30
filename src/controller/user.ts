@@ -42,7 +42,7 @@ export const searchUser = async (
       where: {
         userId,
       },
-      attributes: ['id', 'username', 'avatarUrl'],
+      attributes: ['id', 'username', 'avatarUrl', 'pushToken'],
     });
     user ? res.status(200).json(user) : res.status(400).send('No result.');
   } catch (e) {
@@ -109,7 +109,7 @@ export const getUserInfo = async (
     const { id } = req.user;
     const user = await User.findOne({
       where: { id },
-      attributes: ['id', 'username', 'userId', 'avatarUrl'],
+      attributes: ['id', 'username', 'userId', 'avatarUrl', 'pushToken'],
     });
     res.status(200).json(user);
   } catch (e) {

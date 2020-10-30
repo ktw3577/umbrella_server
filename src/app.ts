@@ -8,16 +8,12 @@ import router from './route';
 import passport from 'passport';
 require('./passport');
 import isLoggedIn from './passport/middleware';
-import { createServer } from 'http';
-//import SocketIO from 'socket.io';
 import Expo, { ExpoPushMessage } from 'expo-server-sdk';
 import User from './model/models/user';
 
 import AWS from 'aws-sdk';
 const app = express();
 const expo = new Expo();
-const http = createServer(app);
-//const io = SocketIO(http);
 
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -47,9 +43,30 @@ app.get('/', (req: express.Request, res: express.Response) => {
   res.send('hello');
 });
 
+const handlePushMessage = (message: ExpoPushMessage) => {
+  const pushToken = message.to;
+  const notifications: ExpoPushMessage[] = [];
+  if (!Expo.isExpoPushToken(pushToken)) {
+    console.error(`Push token ${pushToken} is not a valid Expo push token`);
+  }
+  notifications.push(message);
+  console.log(notifications);
+  const chunks = expo.chunkPushNotifications(notifications);
+  (async () => {
+    for (const chunk of chunks) {
+      try {
+        const receipts = await expo.sendPushNotificationsAsync(chunk);
+        console.log(receipts);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  })();
+};
+
 //푸쉬알림 요청
-app.post('/pushAlarm', (req, res) => {
-  handlePushMessage(req.body);
+app.post('/pushAlarm', async (req, res) => {
+  await handlePushMessage(req.body);
   console.log(`Received message, ${req.body}`);
   res.send(`Received message, ${req.body}`);
 });
@@ -61,64 +78,7 @@ app.patch('/pushToken', async (req, res) => {
   res.send(`Received push token, ${req.body.token.value}`);
 });
 
-const handlePushMessage = (message: ExpoPushMessage) => {
-  const pushToken = message.to;
-  let notifications: ExpoPushMessage[] = [];
-  if (!Expo.isExpoPushToken(pushToken)) {
-    console.error(`Push token ${pushToken} is not a valid Expo push token`);
-  }
-  notifications.push(message);
-  console.log(notifications);
-  let chunks = expo.chunkPushNotifications(notifications);
-  (async () => {
-    for (let chunk of chunks) {
-      try {
-        let receipts = await expo.sendPushNotificationsAsync(chunk);
-        console.log(receipts);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  })();
-};
-
-/* io.sockets.on('connection', socket => {
-  socket.on('login', data => {
-    User.update({ socktId: socket.id }, { where: { id: data.id } }).then(() => {
-      console.log('login detected');
-    });
-  });
-  socket.on('disconnect', () => {
-    User.update({ socketId: '' }, { where: { socketId: socket.id } }).then(
-      () => {
-        console.log('disconnect detected');
-      }
-    );
-  });
-  socket.on('push', async data => {
-    const user = await User.findOne({
-      where: {
-        id: data.userId,
-      },
-      attributes: ['id', 'socketId'],
-    });
-    const friend = await User.findOne({
-      where: {
-        id: data.friendId,
-      },
-      attributes: ['id', 'socketId', 'pushToken'],
-    });
-    const socketsInfo = {
-      user: {
-        id : 
-      },
-      friend: friend,
-    };
-    io.to(friend.socketId).emit('push2', socketsInfo);
-  });
-});
- */
-http.listen(3000, () => {
+app.listen(3000, () => {
   console.log('http://localhost:3000');
   sequelize.authenticate().then(async () => {
     console.log('Database connected.');
@@ -129,15 +89,3 @@ http.listen(3000, () => {
     }
   });
 });
-
-/* app.listen(3000, () => {
-  console.log('http://localhost:3000');
-  sequelize.authenticate().then(async () => {
-    console.log('Database connected.');
-    try {
-      await sequelize.sync({ force: false });
-    } catch (error) {
-      console.error(error);
-    }
-  });
-}); */
