@@ -57,7 +57,9 @@ export const createSchedule = async (
       const todosPromise = [];
       for (let i = 0; i < todos.length; i++) {
         todosPromise[i] = Todo.create({
-          location: todos[i]['location'],
+          longitude: todos[i]['longitude'],
+          latitude: todos[i]['latitude'],
+          placeName: todos[i]['placeName'],
           hour: todos[i]['hour'],
           minutes: todos[i]['minutes'],
           scheduleId: schedule.id,
@@ -106,9 +108,12 @@ export const changeSchedule = async (
       const todosPromise = [];
       for (let i = 0; i < todos.length; i++) {
         todosPromise[i] = Todo.create({
-          location: todos[i]['location'],
+          longitude: todos[i]['longitude'],
+          latitude: todos[i]['latitude'],
+          placeName: todos[i]['placeName'],
           hour: todos[i]['hour'],
           minutes: todos[i]['minutes'],
+          note: todos[i]['note'],
           scheduleId,
         });
       }
