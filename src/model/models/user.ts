@@ -90,6 +90,10 @@ export default class User extends Model<User> {
   @Column
   accessToken: string;
 
+  @AllowNull(true)
+  @Column
+  pushToken: string;
+
   @BelongsToMany(() => User, () => Friend, 'follower', 'following')
   followers: Array<User & { Friend: Friend }>;
 
