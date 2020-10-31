@@ -118,6 +118,7 @@ const handlePushMessage = (message: ExpoPushMessage) => {
   });
 });
  */
+
 http.listen(3000, () => {
   console.log('http://localhost:3000');
   sequelize.authenticate().then(async () => {
