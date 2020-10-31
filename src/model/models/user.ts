@@ -94,6 +94,10 @@ export default class User extends Model<User> {
   @Column
   pushToken: string;
 
+  @AllowNull(true)
+  @Column
+  socketId: string;
+
   @BelongsToMany(() => User, () => Friend, 'follower', 'following')
   followers: Array<User & { Friend: Friend }>;
 

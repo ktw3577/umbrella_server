@@ -42,7 +42,7 @@ export const searchUser = async (
       where: {
         userId,
       },
-      attributes: ['id', 'username', 'avatarUrl', 'pushToken'],
+      attributes: ['id', 'username', 'avatarUrl', 'pushToken', 'socketId'],
     });
     user ? res.status(200).json(user) : res.status(400).send('No result.');
   } catch (e) {

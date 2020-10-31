@@ -9,15 +9,14 @@ import passport from 'passport';
 require('./passport');
 import isLoggedIn from './passport/middleware';
 import { createServer } from 'http';
-//import SocketIO from 'socket.io';
+import SocketIO from 'socket.io';
 import Expo, { ExpoPushMessage } from 'expo-server-sdk';
 import User from './model/models/user';
-
 import AWS from 'aws-sdk';
 const app = express();
 const expo = new Expo();
 const http = createServer(app);
-//const io = SocketIO(http);
+const io = SocketIO(http);
 
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -82,12 +81,15 @@ const handlePushMessage = (message: ExpoPushMessage) => {
   })();
 };
 
-/* io.sockets.on('connection', socket => {
+io.sockets.on('connection', socket => {
+  //로그인하면 User에 socketId저장
   socket.on('login', data => {
     User.update({ socktId: socket.id }, { where: { id: data.id } }).then(() => {
       console.log('login detected');
     });
   });
+  //로그인하면 User에 socketId제거..   이걸하지않고 그냥 로그인이벤트만 해도된다
+  //(그런데 왠지 예제들은 전부 이런식으로 제거하게 만들어놔서 놔둠)
   socket.on('disconnect', () => {
     User.update({ socketId: '' }, { where: { socketId: socket.id } }).then(
       () => {
@@ -95,29 +97,11 @@ const handlePushMessage = (message: ExpoPushMessage) => {
       }
     );
   });
-  socket.on('push', async data => {
-    const user = await User.findOne({
-      where: {
-        id: data.userId,
-      },
-      attributes: ['id', 'socketId'],
-    });
-    const friend = await User.findOne({
-      where: {
-        id: data.friendId,
-      },
-      attributes: ['id', 'socketId', 'pushToken'],
-    });
-    const socketsInfo = {
-      user: {
-        id : 
-      },
-      friend: friend,
-    };
-    io.to(friend.socketId).emit('push2', socketsInfo);
+  socket.on('sendPushAlarm', socketId => {
+    io.to(socketId).emit('updateFriendList');
   });
 });
- */
+
 http.listen(3000, () => {
   console.log('http://localhost:3000');
   sequelize.authenticate().then(async () => {
