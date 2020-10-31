@@ -97,6 +97,7 @@ io.sockets.on('connection', socket => {
       }
     );
   });
+  //클라이언트에 친구리스트 업데이트 요청
   socket.on('sendPushAlarm', socketId => {
     io.to(socketId).emit('updateFriendList');
   });
