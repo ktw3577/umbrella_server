@@ -213,7 +213,7 @@ export const rejectFriend = async (
         receiver: id,
       },
     });
-    res.send(200).send('The rejection of the request has been completed.');
+    res.status(200).send('The rejection of the request has been completed.');
   } catch (e) {
     console.error(e);
     res.status(500).send('Internal server error');

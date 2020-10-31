@@ -48,17 +48,17 @@ app.get('/', (req: express.Request, res: express.Response) => {
 });
 
 //푸쉬알림 요청
-app.post('/pushAlarm', (req, res) => {
+app.post('/pushAlarm', isLoggedIn, (req, res) => {
   handlePushMessage(req.body);
   console.log(`Received message, ${req.body}`);
   res.send(`Received message, ${req.body}`);
 });
 //토큰저장 요청
-app.patch('/pushToken', async (req, res) => {
+app.patch('/pushToken', isLoggedIn, async (req, res) => {
   const { id } = req.user;
-  await User.update({ pushToken: req.body.token.value }, { where: { id: id } });
-  console.log(`Received push token, ${req.body.token.value}`);
-  res.send(`Received push token, ${req.body.token.value}`);
+  await User.update({ pushToken: req.body.token }, { where: { id: id } });
+  console.log(`Received push token, ${req.body.token}`);
+  res.send(`Received push token, ${req.body.token}`);
 });
 
 const handlePushMessage = (message: ExpoPushMessage) => {
