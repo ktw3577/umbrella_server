@@ -17,8 +17,8 @@ import AWS from 'aws-sdk';
 const app = express();
 const expo = new Expo();
 const http = createServer(app);
-let socketAdapter: SocketIO.Adapter;
-const io = SocketIO(http, { adapter: socketAdapter });
+//let socketAdapter: SocketIO.Adapter;
+const io = SocketIO(http, { transports: ['websocket'] });
 //io.adapter(socketAdapter);
 
 AWS.config.update({
@@ -86,6 +86,8 @@ const handlePushMessage = (message: ExpoPushMessage) => {
 
 io.on('connection', socket => {
   //로그인하면 User에 socketId저장
+  io.to(socket.id).emit;
+
   socket.on('login', data => {
     User.update({ socketId: socket.id }, { where: { id: data.id } }).then(
       () => {
@@ -104,16 +106,14 @@ io.on('connection', socket => {
   });
   //클라이언트에 친구리스트 업데이트 요청
   socket.on('sendPushAlarm', socketId => {
-    console.log(socketId);
-    socketAdapter.add(socketId, `${socketId} + ${socket.id}`);
-    socketAdapter.add(socket.id, `${socketId} + ${socket.id}`);
-    io.to(`${socketId} + ${socket.id}`).emit('updateFriendList');
+    socket.join(`${socketId}+${socket.id}`);
+    const socketData = { room: `${socketId}+${socket.id}`, socketId: socketId };
+    io.emit('checkSocketId', socketData);
   });
 
-  socket.on('updateList', socketId => {
-    socketAdapter.add(socketId, `${socketId}+${socket.id}`);
-    socketAdapter.add(socket.id, `${socketId}+${socket.id}`);
-    io.to(`${socketId}+${socket.id}`).emit('updateFriendList');
+  socket.on('updateList', room => {
+    socket.join(room);
+    io.in(room).emit('updateFriendList');
   });
 });
 
