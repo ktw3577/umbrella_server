@@ -17,9 +17,7 @@ import AWS from 'aws-sdk';
 const app = express();
 const expo = new Expo();
 const http = createServer(app);
-//let socketAdapter: SocketIO.Adapter;
 const io = SocketIO(http, { transports: ['websocket'] });
-//io.adapter(socketAdapter);
 
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -86,8 +84,6 @@ const handlePushMessage = (message: ExpoPushMessage) => {
 
 io.on('connection', socket => {
   //로그인하면 User에 socketId저장
-  io.to(socket.id).emit;
-
   socket.on('login', data => {
     User.update({ socketId: socket.id }, { where: { id: data.id } }).then(
       () => {
@@ -95,8 +91,7 @@ io.on('connection', socket => {
       }
     );
   });
-  //로그인하면 User에 socketId제거..   이걸하지않고 그냥 로그인이벤트만 해도된다
-  //(그런데 왠지 예제들은 전부 이런식으로 제거하게 만들어놔서 놔둠)
+  //로그아웃하면 User에 socketId제거
   socket.on('disconnect', () => {
     User.update({ socketId: '' }, { where: { socketId: socket.id } }).then(
       () => {
@@ -105,15 +100,12 @@ io.on('connection', socket => {
     );
   });
   //클라이언트에 친구리스트 업데이트 요청
-  socket.on('sendPushAlarm', socketId => {
-    socket.join(`${socketId}+${socket.id}`);
-    const socketData = { room: `${socketId}+${socket.id}`, socketId: socketId };
-    io.emit('checkSocketId', socketData);
+  socket.on('sendPushAlarm', () => {
+    io.emit('updateFriendList');
   });
 
-  socket.on('updateList', room => {
-    socket.join(room);
-    io.in(room).emit('updateFriendList');
+  socket.on('updateList', () => {
+    io.emit('updateFriendList');
   });
 });
 
@@ -128,15 +120,3 @@ http.listen(3000, () => {
     }
   });
 });
-
-/* app.listen(3000, () => {
-  console.log('http://localhost:3000');
-  sequelize.authenticate().then(async () => {
-    console.log('Database connected.');
-    try {
-      await sequelize.sync({ force: false });
-    } catch (error) {
-      console.error(error);
-    }
-  });
-}); */
