@@ -104,8 +104,8 @@ io.sockets.on('connection', socket => {
   socket.on('sendPushAlarm', socketId => {
     io.to(socketId).emit('updateFriendList');
   });
-  socket.on('updateList', () => {
-    io.to(socket.id).emit('updateFriendList');
+  socket.on('updateList', socketId => {
+    io.to(socketId).emit('updateFriendList');
   });
 });
 
