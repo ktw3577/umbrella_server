@@ -17,7 +17,9 @@ import AWS from 'aws-sdk';
 const app = express();
 const expo = new Expo();
 const http = createServer(app);
-const io = SocketIO(http);
+let socketAdapter: SocketIO.Adapter;
+const io = SocketIO(http, { adapter: socketAdapter });
+//io.adapter(socketAdapter);
 
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -82,7 +84,7 @@ const handlePushMessage = (message: ExpoPushMessage) => {
   })();
 };
 
-io.sockets.on('connection', socket => {
+io.on('connection', socket => {
   //로그인하면 User에 socketId저장
   socket.on('login', data => {
     User.update({ socketId: socket.id }, { where: { id: data.id } }).then(
@@ -102,10 +104,16 @@ io.sockets.on('connection', socket => {
   });
   //클라이언트에 친구리스트 업데이트 요청
   socket.on('sendPushAlarm', socketId => {
-    io.to(socketId).emit('updateFriendList');
+    console.log(socketId);
+    socketAdapter.add(socketId, `${socketId} + ${socket.id}`);
+    socketAdapter.add(socket.id, `${socketId} + ${socket.id}`);
+    io.to(`${socketId} + ${socket.id}`).emit('updateFriendList');
   });
+
   socket.on('updateList', socketId => {
-    io.to(socketId).emit('updateFriendList');
+    socketAdapter.add(socketId, `${socketId}+${socket.id}`);
+    socketAdapter.add(socket.id, `${socketId}+${socket.id}`);
+    io.to(`${socketId}+${socket.id}`).emit('updateFriendList');
   });
 });
 
