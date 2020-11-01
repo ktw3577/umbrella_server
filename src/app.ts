@@ -13,6 +13,7 @@ import SocketIO from 'socket.io';
 import Expo, { ExpoPushMessage } from 'expo-server-sdk';
 import User from './model/models/user';
 import AWS from 'aws-sdk';
+
 const app = express();
 const expo = new Expo();
 const http = createServer(app);
@@ -84,9 +85,11 @@ const handlePushMessage = (message: ExpoPushMessage) => {
 io.sockets.on('connection', socket => {
   //로그인하면 User에 socketId저장
   socket.on('login', data => {
-    User.update({ socktId: socket.id }, { where: { id: data.id } }).then(() => {
-      console.log('login detected');
-    });
+    User.update({ socketId: socket.id }, { where: { id: data.id } }).then(
+      () => {
+        console.log('login detected');
+      }
+    );
   });
   //로그인하면 User에 socketId제거..   이걸하지않고 그냥 로그인이벤트만 해도된다
   //(그런데 왠지 예제들은 전부 이런식으로 제거하게 만들어놔서 놔둠)
@@ -100,6 +103,9 @@ io.sockets.on('connection', socket => {
   //클라이언트에 친구리스트 업데이트 요청
   socket.on('sendPushAlarm', socketId => {
     io.to(socketId).emit('updateFriendList');
+  });
+  socket.on('updateList', () => {
+    io.to(socket.id).emit('updateFriendList');
   });
 });
 
