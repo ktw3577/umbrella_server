@@ -100,17 +100,12 @@ io.on('connection', socket => {
     );
   });
   //클라이언트에 친구리스트 업데이트 요청
-  socket.on('sendPushAlarm', socketData => {
-    socket.join(socketData.room, () => {
-      io.emit('socketJoin', socketData);
-    });
-    //io.emit('socketJoin', socketData);
+  socket.on('sendPushAlarm', () => {
+    io.emit('updateFriendList');
   });
 
-  socket.on('updateList', room => {
-    socket.join(room, () => {
-      io.of('/').to(room).emit('updateFriendList');
-    });
+  socket.on('updateList', () => {
+    io.emit('updateFriendList');
   });
 });
 
