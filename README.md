@@ -308,7 +308,7 @@ src
 
 ## 📃 Detail Page
 
-### 👉 [Go To Wiki](https://github.com/codestates/bringtheumbrella-clientw/wiki)
+### 👉 [Go To Wiki](https://github.com/codestates/bringtheumbrella-server/wiki)
 
 <br />
 ​
