@@ -299,7 +299,7 @@ src
 | TEAM      | Blog                                      | Github                                           |
 | --------- | ----------------------------------------- | ------------------------------------------------ |
 | 😀 김도움 | [velog](https://velog.io/@kdo0129)        | [@doumkim](https://github.com/doumkim)           |
-| 😁 김태원 | [tistory](https://commonseed.tistory.com) | [@ktw3588](https://github.com/ktw3588)           |
+| 😁 김태원 | [tistory](https://commonseed.tistory.com) | [@ktw3577](https://github.com/ktw3577)           |
 | 🤗 김병준 | [gatsby](https://spicycookie.me)          | [@billowycloud](https://github.com/billowycloud) |
 
 ​
